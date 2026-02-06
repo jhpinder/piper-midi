@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<suppressions>
+    <suppress>
+        <id>checkersReport</id>
+    </suppress>
+    <suppress>
+        <id>missingIncludeSystem</id>
+    </suppress>
+</suppressions>

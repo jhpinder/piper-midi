@@ -1,0 +1,26 @@
+{
+    "name": "piper-midi",
+    "version": "0.1.0",
+    "description": "A lightweight MIDI alternative for pipe organ control systems.",
+    "keywords": [
+        "MIDI",
+        "pipe organ",
+        "music",
+        "control system",
+        "synthesizer",
+        "lightweight",
+        "protocol"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jhpinder/piper-midi.git"
+    },
+    "authors": [
+        {
+            "name": "James Pinder",
+            "maintainer": true
+        }
+    ],
+    "frameworks": "*",
+    "platforms": "*"
+}
