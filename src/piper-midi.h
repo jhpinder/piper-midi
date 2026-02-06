@@ -3,8 +3,7 @@
 
 #include <cstdint>
 
-namespace PiperMidi
-{
+namespace PiperMidi {
 
   /**
    * Represents a Piper MIDI message with rank number, note on/off status, and pipe number.
@@ -12,8 +11,7 @@ namespace PiperMidi
    * - Byte 0: Bits 0-6 for rank number (0-127), Bit 7 for note on/off (1 for on, 0 for off)
    * - Byte 1: Note number (0-255)
    */
-  struct PiperMidiMessage
-  {
+  struct PiperMidiMessage {
     uint8_t rankNumber;
     bool isNoteOn;
     uint8_t noteNumber;
@@ -24,8 +22,12 @@ namespace PiperMidi
      * Packs the PiperMidiMessage into a 2-byte buffer
      * @param buffer Pointer to a 2-byte buffer where the packed message will be stored
      */
-    void pack(uint8_t *buffer) const
-    {
+    void pack(uint8_t* buffer) const {
+      if (buffer == nullptr)
+        return;
+      if (buffer[1] >= 256)
+        return;
+
       uint8_t status = (rankNumber & 0x7F);
       if (isNoteOn)
         status |= 0x80;
@@ -40,8 +42,7 @@ namespace PiperMidi
      * @param buffer Pointer to a 2-byte buffer containing the properly formed packed message
      * @return Unpacked PiperMidiMessage
      */
-    static PiperMidiMessage unpack(const uint8_t *buffer)
-    {
+    static PiperMidiMessage unpack(const uint8_t* buffer) {
       PiperMidiMessage message;
       message.rankNumber = buffer[0] & 0x7F;
       message.isNoteOn = (buffer[0] & 0x80) != 0;
