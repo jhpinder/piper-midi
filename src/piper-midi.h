@@ -6,15 +6,26 @@
 namespace PiperMidi {
 
   /**
+   * Enum representing the status of a Piper MIDI message.
+   * The status is determined by the two most significant bits of the first byte:
+   * - 00: Note On
+   * - 01: Note Off
+   * - 10: Piston Press
+   * - 11: Reserved
+   */
+  enum class PiperMidiMessageType { NoteOn, NoteOff, PistonPress, Reserved };
+
+  /**
    * Represents a Piper MIDI message with rank number, note on/off status, and pipe number.
    * The message is packed into 2 bytes:
-   * - Byte 0: Bits 0-6 for rank number (0-127), Bit 7 for note on/off (1 for on, 0 for off)
-   * - Byte 1: Note number (0-255)
+   * - Byte 0: Bits 0-6 for column number (0-63), Bits 7-8 for status bits.
+   * (00 = note on, 01 = note off, 10 = piston press, 11 = reserved)
+   * - Byte 1: Number (0-255)
    */
   struct PiperMidiMessage {
-    uint8_t rankNumber;
-    bool isNoteOn;
-    uint8_t noteNumber;
+    uint8_t columnNumber;
+    PiperMidiMessageType status;
+    uint8_t number;
 
     static_assert(sizeof(uint8_t) == 1, "Platform must support 8-bit bytes");
 
@@ -28,12 +39,11 @@ namespace PiperMidi {
       if (buffer[1] >= 256)
         return;
 
-      uint8_t status = (rankNumber & 0x7F);
-      if (isNoteOn)
-        status |= 0x80;
+      uint8_t status = (columnNumber & 0x3F);
+      status |= (static_cast<uint8_t>(status) << 6);
 
       buffer[0] = status;
-      buffer[1] = noteNumber;
+      buffer[1] = number;
     }
 
     /**
@@ -44,9 +54,9 @@ namespace PiperMidi {
      */
     static PiperMidiMessage unpack(const uint8_t* buffer) {
       PiperMidiMessage message;
-      message.rankNumber = buffer[0] & 0x7F;
-      message.isNoteOn = (buffer[0] & 0x80) != 0;
-      message.noteNumber = buffer[1];
+      message.columnNumber = buffer[0] & 0x3F;
+      message.status = static_cast<PiperMidiMessageType>((buffer[0] >> 6) & 0x03);
+      message.number = buffer[1];
       return message;
     }
   };

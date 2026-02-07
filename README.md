@@ -35,14 +35,14 @@ Even the largest pipe organs do not play more than half of the pipes at once, in
 piper-midi uses a similar packet structure to MIDI, but increases the amount of channels and reduces the amount of message types. The packet structure is as follows:
 ```
 Byte 1: Status
-    Bits 1-7: unsigned 7-bit rank number (0-127)
-    Bit 8: Note On/Off (1 = On, 0 = Off)
-Byte 2: unsigned 8-bit output number (0-255)
+    Bits 1-6: unsigned 6-bit column number (0-63)
+    Bits 7-8: status bits (00 = note on, 01 = note off, 10 = piston press, 11 = reserved)
+    Byte 2: unsigned 8-bit number (0-255)
 ```
 ```cpp
   struct PiperMidiMessage {
-    uint16_t rankNumber : 7;
-    uint16_t isNoteOn : 1;
-    uint16_t pipeNumber : 8;
+    uint8_t columnNumber : 6;
+    uint8_t status : 2;
+    uint8_t number : 8;
   };
 ```
