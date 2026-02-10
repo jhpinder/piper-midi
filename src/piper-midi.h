@@ -5,6 +5,11 @@
 
 namespace PiperMidi {
 
+  struct PackedPiperMidiMessage {
+    uint8_t byte1;
+    uint8_t byte2;
+  };
+
   /**
    * Enum representing the status of a Piper MIDI message.
    * The status is determined by the two most significant bits of the first byte:
@@ -31,36 +36,32 @@ namespace PiperMidi {
 
     /**
      * Packs the PiperMidiMessage into a 2-byte buffer
-     * @param buffer Pointer to a 2-byte buffer where the packed message will be stored
+     * @param buffer Pointer to a PackedPiperMidiMessage buffer where the packed message will be stored
      */
-    void pack(uint8_t* buffer) const {
+    void pack(PackedPiperMidiMessage* buffer) const {
       if (buffer == nullptr)
         return;
-      if (buffer[1] >= 256)
+      if (buffer->byte2 >= 256)
         return;
 
       uint8_t status = (columnNumber & 0x3F);
       status |= (static_cast<uint8_t>(status) << 6);
 
-      buffer[0] = status;
-      buffer[1] = number;
+      buffer->byte1 = status;
+      buffer->byte2 = number;
     }
 
     /**
      * Unpacks a PiperMidiMessage from a 2-byte buffer
      * Note: the buffer must be at least 2 bytes long and properly formatted as per the pack() method.
-     * @param buffer Pointer to a 2-byte buffer containing the properly formed packed message
-     * @return Unpacked PiperMidiMessage
+     * @param buffer Pointer to a PackedPiperMidiMessage buffer containing the properly formed packed message
      */
-    static PiperMidiMessage unpack(const uint8_t* buffer) {
-      PiperMidiMessage message;
-      message.columnNumber = buffer[0] & 0x3F;
-      message.status = static_cast<PiperMidiMessageType>((buffer[0] >> 6) & 0x03);
-      message.number = buffer[1];
-      return message;
+    void unpack(const PackedPiperMidiMessage* buffer) {
+      columnNumber = buffer->byte1 & 0x3F;
+      status = static_cast<PiperMidiMessageType>((buffer->byte1 >> 6) & 0x03);
+      number = buffer->byte2;
     }
   };
-
 } // namespace PiperMidi
 
 #endif // PIPER_MIDI_H
